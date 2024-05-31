@@ -11,9 +11,9 @@ let fillers = [];
 let recognitionFace;
 let feedbackTimeout;
 
-const distractorImages = Array.from({ length: 20 }, (_, i) => `distractor-task/cat${i + 1}.jpg`)
-    .concat(Array.from({ length: 10 }, (_, i) => `distractor-task/dog${i + 1}.jpg`))
-    .concat(Array.from({ length: 10 }, (_, i) => `distractor-task/street${i + 1}.jpg`));
+const distractorImages = Array.from({ length: 20 }, (_, i) => `images/distractor-task/cat${i + 1}.jpg`)
+    .concat(Array.from({ length: 10 }, (_, i) => `images/distractor-task/dog${i + 1}.jpg`))
+    .concat(Array.from({ length: 10 }, (_, i) => `images/distractor-task/street${i + 1}.jpg`));
 const distractorTasks = ["cat", "dog", "street"];
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -45,7 +45,7 @@ function selectFaces() {
     const folder = determineFolder(isBuildup);
     faces = [];
     while (faces.length < facesPerTrial) {
-        let face = `${folder}/face${Math.floor(Math.random() * 40) + 1}.jpg`;
+        let face = `images/${folder}/face${Math.floor(Math.random() * 40) + 1}.jpg`;
         if (!usedFaces.has(face)) {
             faces.push(face);
             usedFaces.add(face);
