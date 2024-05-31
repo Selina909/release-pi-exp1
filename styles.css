@@ -1,0 +1,82 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+#instruction-container {
+    text-align: center;
+    max-width: 600px;
+    background: white;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+.hidden {
+    display: none;
+}
+
+#container {
+    text-align: center;
+}
+
+#faces-container img, #distractor-grid img {
+    max-width: 160px;
+    max-height: 160px;
+    margin: 0 10px;
+    cursor: pointer;
+}
+
+#faces-container img {
+    border: none;
+}
+
+#distractor-grid img.selected {
+    border: 3px solid red;
+}
+
+#feedback {
+    margin-top: 20px;
+}
+
+#distractor-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 10px;
+}
+
+#distractor-container button {
+    margin-top: 20px;
+}
+
+#survey-container {
+    text-align: left;
+    max-width: 600px;
+    background: white;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+#survey-form div {
+    margin-bottom: 15px;
+}
+
+#survey-form label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+#completion-container {
+    text-align: center;
+    max-width: 600px;
+    background: white;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}

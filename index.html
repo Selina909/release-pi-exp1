@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Recognition Experiment</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="instruction-container">
+        <h1>Instructions & Consent</h1>
+        <p>This study studies human’s capability for multi-tasking. Specifically, you will be asked to study a series of faces while doing some visual search tasks. The experiment includes 8 trials. Please provide your response to each task as quick as possible!</p>
+        <p>By clicking "I agree" you indicate that: you are at least 18 years of age and have normal vision, the research has been explained to you, and you freely and voluntarily choose to participate in this research project.</p>
+        <label><input type="checkbox" id="consent-checkbox"> I agree</label>
+        <button id="start-button" class="hidden" onclick="startExperiment()">Start</button>
+    </div>
+    <div id="container" class="hidden">
+        <h1 id="trial-number"></h1>
+        <div id="faces-container" class="hidden"></div>
+        <div id="distractor-container" class="hidden">
+            <h2 id="distractor-instruction"></h2>
+            <div id="distractor-grid"></div>
+            <button id="distractor-submit" onclick="submitDistractorTask()">Submit</button>
+        </div>
+        <div id="feedback" class="hidden"></div>
+    </div>
+    <div id="survey-container" class="hidden">
+        <h1>Survey</h1>
+        <form id="survey-form">
+            <div>
+                <label for="age">Please enter your age:</label>
+                <input type="number" id="age" name="age" required>
+            </div>
+            <div>
+                <label>Please indicate your gender:</label>
+                <label><input type="radio" name="gender" value="Male" required> Male</label>
+                <label><input type="radio" name="gender" value="Female"> Female</label>
+                <label><input type="radio" name="gender" value="Non-binary"> Non-binary</label>
+                <label><input type="radio" name="gender" value="Other"> Other</label>
+            </div>
+            <div>
+                <label>Please indicate your race:</label>
+                <label><input type="checkbox" name="race" value="White"> White</label>
+                <label><input type="checkbox" name="race" value="Asian"> Asian</label>
+                <label><input type="checkbox" name="race" value="Black/African American"> Black/African American</label>
+                <label><input type="checkbox" name="race" value="American Indian/Alaska Native"> American Indian/Alaska Native</label>
+                <label><input type="checkbox" name="race" value="Native Hawaiian/Other Pacific Islander"> Native Hawaiian/Other Pacific Islander</label>
+                <label><input type="checkbox" name="race" value="Other"> Other</label>
+            </div>
+            <div>
+                <label>What is the highest level of education you have completed?</label>
+                <label><input type="radio" name="education" value="Less than high school credential" required> Less than high school credential</label>
+                <label><input type="radio" name="education" value="High school credential"> High school credential</label>
+                <label><input type="radio" name="education" value="Some college"> Some college</label>
+                <label><input type="radio" name="education" value="Bachelor's degree"> Bachelor's degree</label>
+                <label><input type="radio" name="education" value="Graduate degree"> Graduate degree</label>
+            </div>
+            <div>
+                <label>Have you ever seen any of the faces presented to you today prior to taking this experiment? [Your response will not affect your compensation, please answer honestly]</label>
+                <label><input type="radio" name="seenFaces" value="Yes" required> Yes</label>
+                <label><input type="radio" name="seenFaces" value="No"> No</label>
+            </div>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+    <div id="completion-container" class="hidden">
+        <h1>You have completed this study. Thank you!</h1>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
