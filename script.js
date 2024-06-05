@@ -1,9 +1,10 @@
 const totalTrials = 8; // Total number of trials in the experiment
 const facesPerTrial = 6; // Number of faces to be used per trial
 const targetFaces = 3; // Number of target faces per trial
+let participantID = generateUniqueID();
 let currentTrial = 0; // Track the current trial number
 let currentBlock = 0; // Track the current block of trials
-let condition = 1; // Condition to alternate between sets of faces
+let condition = Math.random() < 0.5 ? 1 : 2; // Randomly assign initial condition
 let usedFaces = new Set(); // Track used faces to avoid repetition
 let faces = []; // Array to hold faces for the current trial
 let targets = []; // Array to hold target faces
@@ -13,12 +14,16 @@ let feedbackTimeout; // Timeout for feedback display
 let distractorStartTime = null; // To record the start time of each distractor task
 let testStartTime = null; // To record the start time of each test face presentation
 
-
 // Distractor images for the distractor task
 const distractorImages = Array.from({ length: 20 }, (_, i) => `images/distractor-task/cat${i + 1}.jpg`)
     .concat(Array.from({ length: 10 }, (_, i) => `images/distractor-task/dog${i + 1}.jpg`))
     .concat(Array.from({ length: 10 }, (_, i) => `images/distractor-task/street${i + 1}.jpg`));
 const distractorTasks = ["cat", "dog", "street"]; // Types of distractor tasks
+
+// Generate a unique 7-digit participant ID
+function generateUniqueID() {
+    return Math.floor(1000000 + Math.random() * 9000000).toString();
+}
 
 // Event listener for the consent checkbox to show/hide the start button
 document.addEventListener("DOMContentLoaded", () => {
