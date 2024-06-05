@@ -10,6 +10,9 @@ let targets = []; // Array to hold target faces
 let fillers = []; // Array to hold filler faces
 let recognitionFace; // The face to be tested in the recognition phase
 let feedbackTimeout; // Timeout for feedback display
+let distractorStartTime = null; // To record the start time of each distractor task
+let testStartTime = null; // To record the start time of each test face presentation
+
 
 // Distractor images for the distractor task
 const distractorImages = Array.from({ length: 20 }, (_, i) => `images/distractor-task/cat${i + 1}.jpg`)
@@ -76,6 +79,7 @@ function showStudyPhase() {
     facesContainer.innerHTML = targets.map(face => `<img src="${face}" alt="face">`).join('');
     facesContainer.classList.remove('hidden');
     setTimeout(showDistractorTask, 2000); // Show distractor task after a delay
+    distractorStartTime = new Date().getTime(); // Record the start time of distractor task
 }
 
 // Function to show the distractor task
@@ -110,6 +114,8 @@ function submitDistractorTask() {
     const allCorrect = correctImages && selectedImages.length === document.querySelectorAll(`#distractor-grid img[src*="${selectedTask}"]`).length;
 
     if (allCorrect) {
+        const distractorReactionTime = new Date().getTime() - distractorStartTime; // Calculate distractor task reaction time
+        console.log(`Reaction time for distractor task: ${distractorReactionTime} ms`); // Log reaction time
         showFeedback("Great! You have passed the task.");
         setTimeout(showRecognitionPhase, 1000); // Show recognition phase after a delay
     } else {
@@ -133,12 +139,15 @@ function showRecognitionPhase() {
     const facesContainer = document.getElementById('faces-container');
     facesContainer.innerHTML = `<img src="${recognitionFace}" alt="face">`;
     facesContainer.classList.remove('hidden');
+    testStartTime = new Date().getTime(); // Record the start time of recognition test
     document.addEventListener('keydown', handleKeyPress); // Listen for key press
 }
 
 // Function to handle key press during recognition phase
 function handleKeyPress(event) {
     if (event.key === '1' || event.key === '2') {
+        const testReactionTime = new Date().getTime() - testStartTime; // Calculate recognition test reaction time
+        console.log(`Reaction time for face: ${testReactionTime} ms`); // Log reaction time
         document.removeEventListener('keydown', handleKeyPress);
         showFeedback(event.key === '1' ? (targets.includes(recognitionFace) ? 'Hit' : 'False Alarm') : (targets.includes(recognitionFace) ? 'False Negative' : 'Correct Rejection'));
         feedbackTimeout = setTimeout(endTrial, 1000); // End trial after feedback
