@@ -192,3 +192,5 @@ function showCompletionMessage() {
     document.getElementById('survey-container').classList.add('hidden');
     document.getElementById('completion-container').classList.remove('hidden');
 }
+
+/* I need to store the following data from each participant: participantID, assigned condition, trial number, distractorReactionTime for each trial, test accuracy (hit, false alarm, false negative, correct rejection) for each trial, testReactionTime for each trial, and survey responses. */
