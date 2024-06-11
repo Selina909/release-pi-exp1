@@ -13,12 +13,15 @@ let recognitionFace; // The face to be tested in the recognition phase
 let feedbackTimeout; // Timeout for feedback display
 let distractorStartTime = null; // To record the start time of each distractor task
 let testStartTime = null; // To record the start time of each test face presentation
+let distractorReactionTimes = [];
+let testAccuracies = [];
+let testReactionTimes = [];
 
 // Distractor images for the distractor task
 const distractorImages = Array.from({ length: 20 }, (_, i) => `images/distractor-task/cat${i + 1}.jpg`)
-    .concat(Array.from({ length: 10 }, (_, i) => `images/distractor-task/dog${i + 1}.jpg`))
-    .concat(Array.from({ length: 10 }, (_, i) => `images/distractor-task/street${i + 1}.jpg`));
-const distractorTasks = ["cat", "dog", "street"]; // Types of distractor tasks
+    .concat(Array.from({ length: 20 }, (_, i) => `images/distractor-task/dog${i + 1}.jpg`))
+    .concat(Array.from({ length: 20 }, (_, i) => `images/distractor-task/car${i + 1}.jpg`));
+const distractorTasks = ["cat", "dog", "car"]; // Types of distractor tasks
 
 // Generate a unique 7-digit participant ID
 function generateUniqueID() {
@@ -120,6 +123,7 @@ function submitDistractorTask() {
 
     if (allCorrect) {
         const distractorReactionTime = new Date().getTime() - distractorStartTime; // Calculate distractor task reaction time
+        distractorReactionTimes.push(distractorReactionTime); // Store reaction time
         console.log(`Reaction time for distractor task: ${distractorReactionTime} ms`); // Log reaction time
         showFeedback("Great! You have passed the task.");
         setTimeout(showRecognitionPhase, 1000); // Show recognition phase after a delay
@@ -152,9 +156,12 @@ function showRecognitionPhase() {
 function handleKeyPress(event) {
     if (event.key === '1' || event.key === '2') {
         const testReactionTime = new Date().getTime() - testStartTime; // Calculate recognition test reaction time
+        testReactionTimes.push(testReactionTime); // Store reaction time
+        const accuracy = event.key === '1' ? (targets.includes(recognitionFace) ? 'Hit' : 'False Alarm') : (targets.includes(recognitionFace) ? 'False Negative' : 'Correct Rejection');
+        testAccuracies.push(accuracy); // Store accuracy
         console.log(`Reaction time for face: ${testReactionTime} ms`); // Log reaction time
         document.removeEventListener('keydown', handleKeyPress);
-        showFeedback(event.key === '1' ? (targets.includes(recognitionFace) ? 'Hit' : 'False Alarm') : (targets.includes(recognitionFace) ? 'False Negative' : 'Correct Rejection'));
+        showFeedback(accuracy);
         feedbackTimeout = setTimeout(endTrial, 1000); // End trial after feedback
     }
 }
@@ -183,7 +190,7 @@ function showSurvey() {
     document.getElementById('survey-container').classList.remove('hidden');
     document.getElementById('survey-form').addEventListener('submit', function(event) {
         event.preventDefault();
-        showCompletionMessage(); // Show completion message after survey submission
+        sendDataToServer(); // Send data to server on survey submission
     });
 }
 
@@ -193,4 +200,40 @@ function showCompletionMessage() {
     document.getElementById('completion-container').classList.remove('hidden');
 }
 
-/* I need to store the following data from each participant: participantID, assigned condition, trial number, distractorReactionTime for each trial, test accuracy (hit, false alarm, false negative, correct rejection) for each trial, testReactionTime for each trial, and survey responses. */
+// Function to send data to the server
+function sendDataToServer() {
+    const trialData = []; // Collect trial data here
+    for (let i = 0; i < totalTrials; i++) {
+        trialData.push({
+            trialNumber: i + 1,
+            distractorReactionTime: distractorReactionTimes[i],
+            testAccuracy: testAccuracies[i],
+            testReactionTime: testReactionTimes[i]
+        });
+    }
+
+    const surveyResponses = {
+        age: document.getElementById('age').value,
+        gender: document.querySelector('input[name="gender"]:checked').value,
+        race: Array.from(document.querySelectorAll('input[name="race"]:checked')).map(el => el.value),
+        education: document.querySelector('input[name="education"]:checked').value,
+        seenFaces: document.querySelector('input[name="seenFaces"]:checked').value
+    };
+
+    const data = new FormData();
+    data.append('participantID', participantID);
+    data.append('condition', condition);
+    data.append('trialData', JSON.stringify(trialData));
+    data.append('surveyResponses', JSON.stringify(surveyResponses));
+
+    fetch('store_data.php', {
+        method: 'POST',
+        body: data
+    })
+    .then(response => response.text())
+    .then(response => {
+        console.log(response);
+        showCompletionMessage();
+    })
+    .catch(error => console.error('Error:', error));
+}
