@@ -67,6 +67,10 @@ body {
     margin-top: 10px;
 }
 
+#test-instruction {
+    font-size: 18px;
+}
+
 #survey-container {
     text-align: left;
     max-width: 600px;
