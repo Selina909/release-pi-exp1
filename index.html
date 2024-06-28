@@ -23,6 +23,7 @@
             <button id="distractor-submit" onclick="submitDistractorTask()">Submit</button>
         </div>
         <div id="feedback" class="hidden"></div>
+        <h2 id="test-instruction" class="hidden"></h2>
     </div>
     <div id="survey-container" class="hidden">
         <h1>Survey</h1>
@@ -66,6 +67,8 @@
     <div id="completion-container" class="hidden">
         <h1>You have completed this study. Thank you!</h1>
     </div>
+    <!-- Hidden input field to store Prolific ID -->
+    <input type="hidden" id="prolific-id">
     <script src="script.js"></script>
 </body>
 </html>
