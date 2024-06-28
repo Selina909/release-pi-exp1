@@ -1,7 +1,12 @@
 const totalTrials = 8; // Total number of trials in the experiment
 const facesPerTrial = 6; // Number of faces to be used per trial
 const targetFaces = 3; // Number of target faces per trial
+
+let experimentStartTime = null; // To record the start time of the experiment
+let experimentEndTime = null; // To record the end time of the experiment
+
 let participantID = generateUniqueID();
+let prolificID = getProlificID(); // Get the Prolific ID from the URL
 let currentTrial = 0; // Track the current trial number
 let currentBlock = 0; // Track the current block of trials
 let condition = Math.random() < 0.5 ? 1 : 2; // Randomly assign initial condition
@@ -17,6 +22,7 @@ let distractorReactionTimes = [];
 let testAccuracies = [];
 let testReactionTimes = [];
 
+
 // Distractor images for the distractor task
 const distractorImages = Array.from({ length: 20 }, (_, i) => `images/distractor-task/cat${i + 1}.jpg`)
     .concat(Array.from({ length: 20 }, (_, i) => `images/distractor-task/dog${i + 1}.jpg`))
@@ -28,15 +34,25 @@ function generateUniqueID() {
     return Math.floor(1000000 + Math.random() * 9000000).toString();
 }
 
+// Function to get the Prolific ID from the URL
+function getProlificID() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('PROLIFIC_PID') || '';
+}
+
 // Event listener for the consent checkbox to show/hide the start button
 document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('consent-checkbox').addEventListener('change', function() {
         document.getElementById('start-button').classList.toggle('hidden', !this.checked);
     });
+    document.getElementById('prolific-id').value = prolificID; // Set the Prolific ID value
 });
+
 
 // Function to start the experiment
 function startExperiment() {
+    experimentStartTime = new Date(); // Record the start time of the experiment
+    console.log (experimentStartTime);
     document.getElementById('instruction-container').classList.add('hidden');
     document.getElementById('container').classList.remove('hidden');
     showTrialNumber(); // Display the trial number
@@ -126,7 +142,7 @@ function submitDistractorTask() {
         distractorReactionTimes.push(distractorReactionTime); // Store reaction time
         console.log(`Reaction time for distractor task: ${distractorReactionTime} ms`); // Log reaction time
         showFeedback("Great! You have passed the task.");
-        setTimeout(showRecognitionPhase, 1000); // Show recognition phase after a delay
+        setTimeout(showTestInstruction, 1000); // Show recognition phase after a delay
     } else {
         showFeedback("Incorrect! Please try again.");
         setTimeout(showDistractorTask, 1000); // Retry distractor task after a delay
@@ -141,9 +157,17 @@ function showFeedback(message) {
     feedbackTimeout = setTimeout(() => feedback.classList.add('hidden'), 1000);
 }
 
+function showTestInstruction() {
+    document.getElementById('distractor-container').classList.add('hidden');
+    const testInstruction = document.getElementById('test-instruction');
+    testInstruction.textContent = `Press 1 if you think the following face is old, press 2 if you think the following face is new`;
+    testInstruction.classList.remove('hidden');
+    setTimeout(showRecognitionPhase, 3000);
+}
+
 // Function to show the recognition phase
 function showRecognitionPhase() {
-    document.getElementById('distractor-container').classList.add('hidden');
+    document.getElementById('test-instruction').classList.add('hidden');
     recognitionFace = faces[Math.floor(Math.random() * facesPerTrial)]; // Select a face for recognition
     const facesContainer = document.getElementById('faces-container');
     facesContainer.innerHTML = `<img src="${recognitionFace}" alt="face">`;
@@ -160,16 +184,14 @@ function handleKeyPress(event) {
         const accuracy = event.key === '1' ? (targets.includes(recognitionFace) ? 'Hit' : 'False Alarm') : (targets.includes(recognitionFace) ? 'False Negative' : 'Correct Rejection');
         testAccuracies.push(accuracy); // Store accuracy
         console.log(`Reaction time for face: ${testReactionTime} ms`); // Log reaction time
+        console.log(`Response accuracy: ${accuracy}`); // Log response accuracy
         document.removeEventListener('keydown', handleKeyPress);
-        showFeedback(accuracy);
-        feedbackTimeout = setTimeout(endTrial, 1000); // End trial after feedback
+        endTrial(); // End trial
     }
 }
 
 // Function to end the current trial
 function endTrial() {
-    clearTimeout(feedbackTimeout);
-    document.getElementById('feedback').classList.add('hidden');
     document.getElementById('faces-container').classList.add('hidden');
     currentTrial++;
     if (currentTrial % 4 === 0) {
@@ -180,6 +202,8 @@ function endTrial() {
         showTrialNumber();
         setTimeout(startTrial, 2000); // Start next trial after a delay
     } else {
+        experimentEndTime = new Date(); // Record the end time of the experiment
+        console.log(experimentEndTime);
         showSurvey(); // Show survey after all trials are completed
     }
 }
@@ -221,7 +245,10 @@ function sendDataToServer() {
     };
 
     const data = new FormData();
+    data.append('experimentStartTime', experimentStartTime.toISOString()); 
+    data.append('experimentEndTime', experimentEndTime.toISOString()); 
     data.append('participantID', participantID);
+    data.append('prolificID', prolificID);
     data.append('condition', condition);
     data.append('trialData', JSON.stringify(trialData));
     data.append('surveyResponses', JSON.stringify(surveyResponses));
@@ -234,6 +261,8 @@ function sendDataToServer() {
     .then(response => {
         console.log(response);
         showCompletionMessage();
+        // Redirect to Prolific completion URL
+        window.location.href = `https://app.prolific.com/submissions/complete?cc=C1MDGC0J`;
     })
     .catch(error => console.error('Error:', error));
 }
